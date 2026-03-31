@@ -1,0 +1,33 @@
+/* FeedView.module.css */
+.container { height: 100%; display: flex; flex-direction: column; background: #0d0d12; }
+.sortBar { padding: 10px 16px 0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.sortLabel { font-size: 12px; color: rgba(255,255,255,0.35); font-family: 'DM Sans', sans-serif; }
+.sortDropdown { position: relative; }
+.sortBtn {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff;
+  font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  padding: 6px 14px; border-radius: 50px; display: flex; align-items: center; gap: 5px;
+  transition: background 0.15s;
+}
+.sortBtn:hover { background: rgba(255,255,255,0.1); }
+.sortMenu {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  background: #1e1e2a; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
+  overflow: hidden; z-index: 999; box-shadow: 0 12px 32px rgba(0,0,0,0.6); min-width: 160px;
+}
+.sortOption {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 16px;
+  background: transparent; border: none; border-left: 2px solid transparent;
+  font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-align: left;
+  transition: all 0.15s;
+}
+.sortOption:hover { background: rgba(255,255,255,0.05); }
+.sortOptionActive { border-left-color: #FF6B35; color: #FF6B35; font-weight: 700; }
+.list { flex: 1; overflow-y: auto; padding: 12px 16px 24px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+.empty { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.25); font-family: 'DM Sans', sans-serif; }
+.fab {
+  position: absolute; bottom: 76px; right: 18px; width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B35, #e85a25); color: #fff; border: none; cursor: pointer;
+  font-size: 24px; box-shadow: 0 4px 20px rgba(255,107,53,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}

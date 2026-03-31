@@ -1,0 +1,37 @@
+/* ActivityDetail.module.css */
+.container { height: 100%; overflow-y: auto; background: #0d0d12; }
+.hero { position: relative; height: 220px; overflow: hidden; background: #111; }
+.heroGradient { background: linear-gradient(160deg, rgba(255,107,53,0.2) 0%, #0d0d12 60%); padding: 20px 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.heroOverlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(13,13,18,0.9) 100%); }
+.heroBack { position: absolute; top: 16px; left: 16px; }
+.heroContent { position: absolute; bottom: 20px; left: 20px; right: 20px; }
+.categoryBadge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
+  backdrop-filter: blur(6px); display: inline-block;
+}
+.heroTitle { font-size: 24px; font-weight: 800; color: #fff; margin: 8px 0 6px; font-family: 'Syne', sans-serif; }
+.hostRow { display: flex; align-items: center; gap: 8px; }
+.hostName { font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'DM Sans', sans-serif; }
+.body { padding: 20px; }
+.section { margin-bottom: 24px; }
+.sectionTitle { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; font-family: 'DM Sans', sans-serif; margin-bottom: 12px; }
+.description { font-size: 14px; color: rgba(255,255,255,0.7); font-family: 'DM Sans', sans-serif; line-height: 1.6; margin: 0; }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.tag { font-size: 11px; padding: 5px 12px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.participant { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 14px; transition: border-color 0.2s; margin-bottom: 8px; }
+.participantName { font-size: 13px; font-weight: 600; color: #fff; font-family: 'DM Sans', sans-serif; }
+.likeBtn {
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; font-size: 16px;
+}
+.actions { display: flex; gap: 10px; }
+.joinBtn { flex: 1; padding: 14px; border-radius: 50px; font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+.chatBtn {
+  width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08); color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.chatBtn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); }
+.mediaGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mediaItem { border-radius: 10px; overflow: hidden; aspect-ratio: 1; background: rgba(255,255,255,0.05); position: relative; }

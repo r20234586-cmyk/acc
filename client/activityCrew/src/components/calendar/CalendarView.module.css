@@ -1,0 +1,41 @@
+/* CalendarView.module.css */
+.container { height: 100%; display: flex; flex-direction: column; background: #0d0d12; overflow: hidden; }
+.header { padding: 20px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.headerLeft { display: flex; align-items: center; gap: 12px; }
+.backBtn { background: rgba(255,255,255,0.07); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.title { font-size: 20px; font-weight: 800; color: #fff; font-family: 'Syne', sans-serif; margin: 0; }
+.subtitle { font-size: 12px; color: rgba(255,255,255,0.3); font-family: 'DM Sans', sans-serif; margin: 2px 0 0; }
+.viewToggle { display: flex; gap: 3px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 3px; }
+.viewBtn { padding: 6px 11px; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all 0.15s; white-space: nowrap; }
+.viewBtnActive { background: rgba(255,255,255,0.12); color: #fff; }
+.monthNav { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px 8px; flex-shrink: 0; }
+.navBtn { background: rgba(255,255,255,0.07); border: none; color: rgba(255,255,255,0.7); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.monthLabel { font-size: 16px; font-weight: 800; color: #fff; font-family: 'Syne', sans-serif; }
+.dayHeaders { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px 4px; flex-shrink: 0; }
+.dayHeader { text-align: center; font-size: 9px; font-weight: 700; letter-spacing: 0.8px; color: rgba(255,255,255,0.22); font-family: 'DM Sans', sans-serif; padding: 4px 0; }
+.calGrid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; gap: 3px; flex-shrink: 0; }
+.dayCell { display: flex; flex-direction: column; align-items: center; padding: 6px 2px 5px; border-radius: 10px; border: none; cursor: pointer; transition: background 0.15s; }
+.dayNum { font-size: 13px; font-family: 'DM Sans', sans-serif; line-height: 1; margin-bottom: 4px; }
+.dots { display: flex; gap: 2px; justify-content: center; min-height: 5px; }
+.dot { width: 4px; height: 4px; border-radius: 50%; }
+.eventList { flex: 1; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 16px 20px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+.dayLabel { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dayLabelText { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); font-family: 'DM Sans', sans-serif; text-transform: uppercase; letter-spacing: 1.2px; }
+.eventCount { font-size: 11px; color: #FF6B35; font-family: 'DM Sans', sans-serif; font-weight: 700; }
+.noEvents { text-align: center; padding: 28px 0; color: rgba(255,255,255,0.18); font-family: 'DM Sans', sans-serif; font-size: 13px; }
+.eventCard { display: flex; gap: 12px; padding: 13px 14px; background: rgba(255,255,255,0.03); border-radius: 14px; cursor: pointer; transition: background 0.15s; margin-bottom: 8px; }
+.eventCard:hover { background: rgba(255,255,255,0.07); }
+.eventPip { width: 3px; border-radius: 3px; align-self: stretch; flex-shrink: 0; }
+.eventInfo { flex: 1; min-width: 0; }
+.eventTitle { font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif; line-height: 1.3; }
+.eventMeta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 5px; }
+.eventMetaItem { font-size: 11px; color: rgba(255,255,255,0.35); font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 4px; }
+.typeBadge { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: 'DM Sans', sans-serif; flex-shrink: 0; margin-left: 8px; }
+.agendaContainer { flex: 1; overflow-y: auto; padding: 16px 16px 28px; scrollbar-width: thin; }
+.agendaGroup { margin-bottom: 24px; }
+.agendaDateRow { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.agendaDateBox { width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.agendaDateDay { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+.agendaDateNum { font-size: 17px; font-weight: 900; line-height: 1; font-family: 'Syne', sans-serif; }
+.agendaDateLabel { font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+.agendaDateCount { font-size: 10px; color: rgba(255,255,255,0.3); font-family: 'DM Sans', sans-serif; }

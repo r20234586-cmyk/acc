@@ -1,0 +1,33 @@
+/* DashboardView.module.css */
+.container { height: 100%; overflow-y: auto; background: #0d0d12; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+.header { padding: 28px 32px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+.headerLeft { display: flex; gap: 16px; align-items: flex-start; }
+.avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; margin-top: 10px; }
+.greeting { font-size: 11px; color: rgba(255,255,255,0.3); font-family: 'DM Sans', sans-serif; margin-bottom: 4px; }
+.name { font-size: 24px; font-weight: 900; color: #fff; font-family: 'Syne', sans-serif; letter-spacing: -0.5px; margin: 0; }
+.email { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; margin-top: 6px; }
+.locStatus { font-size: 12px; font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+.locGranted { color: #34D399; }
+.locRequesting { color: #FBBF24; }
+.locDenied { color: rgba(255,255,255,0.35); }
+.createBtn {
+  padding: 10px 22px; border-radius: 50px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #FF6B35, #e85a25); color: #fff;
+  font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 16px rgba(255,107,53,0.3); transition: transform 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.createBtn:hover { transform: translateY(-1px); }
+.body { padding: 24px 32px; display: flex; flex-direction: column; gap: 32px; }
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.sectionTitle { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1.4px; font-family: 'DM Sans', sans-serif; margin: 0; }
+.sectionAction { background: none; border: none; font-size: 11px; color: #FF6B35; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.statsGrid { display: flex; gap: 12px; }
+.statCard { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.statIcon { font-size: 18px; }
+.statValue { font-size: 26px; font-weight: 900; color: #fff; font-family: 'Syne', sans-serif; line-height: 1; }
+.statUnit { font-size: 11px; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.statLabel { font-size: 10px; color: rgba(255,255,255,0.25); font-family: 'DM Sans', sans-serif; }
+.twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.skeletonRow { height: 12px; border-radius: 8px; background: rgba(255,255,255,0.06); margin-bottom: 8px; }
+.interestTag { font-size: 12px; padding: 6px 14px; border-radius: 20px; background: rgba(255,107,53,0.15); color: #FF6B35; font-family: 'DM Sans', sans-serif; font-weight: 600; border: 1px solid rgba(255,107,53,0.3); }

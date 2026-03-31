@@ -1,0 +1,6 @@
+/* Avatar.module.css */
+.avatar {
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-family: 'DM Sans', sans-serif; flex-shrink: 0;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}

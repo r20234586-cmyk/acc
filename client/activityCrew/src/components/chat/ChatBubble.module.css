@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ChatBubble.module.css
+   Individual message bubble styles — "mine" vs "theirs" layout.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.bubble {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* My messages align right */
+.bubbleMine {
+  flex-direction: row-reverse;
+}
+
+/* Others' messages align left */
+.bubbleTheirs {
+  flex-direction: row;
+}
+
+.content {
+  max-width: 72%;
+}
+
+/* Sender name label (only for others' messages) */
+.senderName {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 3px;
+  margin-left: 4px;
+}
+
+/* The bubble pill itself */
+.text {
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.textMine {
+  border-radius: 18px 18px 4px 18px;
+  /* background set inline using accentColor */
+}
+
+.textTheirs {
+  border-radius: 18px 18px 18px 4px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Pending (optimistic) message — slightly dimmed */
+.textPending {
+  opacity: 0.7;
+}
+
+.timestamp {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  font-family: 'DM Sans', sans-serif;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timestampMine {
+  text-align: right;
+  margin-right: 4px;
+  justify-content: flex-end;
+}
+
+.timestampTheirs {
+  text-align: left;
+  margin-left: 4px;
+}
+
+/* Delete button — appears on hover for own messages */
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  padding: 0;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.deleteBtn:hover {
+  color: #FC8181;
+}
