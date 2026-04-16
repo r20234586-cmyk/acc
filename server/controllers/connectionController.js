@@ -127,6 +127,27 @@ const acceptRequest = async (req, res, next) => {
     if (!conn) return res.status(404).json({ message: 'Request not found' });
 
     await conn.update({ status: 'accepted' });
+
+    // Notify the original requester their request was accepted
+    const acceptor = await User.findByPk(req.userId, { attributes: ['name'] });
+    await createNotification({
+      userId:        conn.requesterId,
+      type:          'connection_request',
+      title:         'Connection accepted',
+      message:       `${acceptor?.name || 'Someone'} accepted your connection request`,
+      relatedUserId: req.userId,
+    });
+
+    // Notify acceptor (confirmation in their feed)
+    const requester = await User.findByPk(conn.requesterId, { attributes: ['name'] });
+    await createNotification({
+      userId:        req.userId,
+      type:          'connection_request',
+      title:         'You are now connected',
+      message:       `You and ${requester?.name || 'Someone'} are now connected`,
+      relatedUserId: conn.requesterId,
+    });
+
     res.status(200).json({ message: 'Connection accepted' });
   } catch (error) {
     next(error);

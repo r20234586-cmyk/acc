@@ -1,9 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════
    Activity Controller — CRUD + Join/Leave + Delete
    ═══════════════════════════════════════════════════════════════════ */
+const { Op }   = require('sequelize');
 const Activity = require('../models/Activity');
 const User     = require('../models/User');
+const Notification = require('../models/Notification');
 const { createNotification } = require('./notificationController');
+const { haversineDistance } = require('../utils/location/haversine');
+
+const PROXIMITY_RADIUS_KM = 10;
 
 /* POST /api/activities — create activity, host auto-joined */
 const createActivity = async (req, res, next) => {
@@ -20,6 +25,40 @@ const createActivity = async (req, res, next) => {
       hostId: req.userId, hostAvatar: initials,
       joined: [req.userId], attendees: [initials],
     });
+
+    // ── Notify nearby users (within 10 km) exactly once per activity ──
+    if (latitude != null && longitude != null) {
+      const delta = PROXIMITY_RADIUS_KM / 111; // 1 deg ≈ 111 km
+      const candidates = await User.findAll({
+        where: {
+          id:        { [Op.ne]: req.userId },
+          latitude:  { [Op.between]: [latitude - delta, latitude + delta] },
+          longitude: { [Op.between]: [longitude - delta, longitude + delta] },
+        },
+        attributes: ['id', 'latitude', 'longitude'],
+      });
+
+      await Promise.all(
+        candidates
+          .filter(u => haversineDistance(latitude, longitude, u.latitude, u.longitude) <= PROXIMITY_RADIUS_KM)
+          .map(async (u) => {
+            // Dedup: skip if user already has a new_activity notif for this activity
+            const existing = await Notification.findOne({
+              where: { userId: u.id, type: 'new_activity', relatedActivityId: activity.id },
+            });
+            if (existing) return;
+            await createNotification({
+              userId:            u.id,
+              type:              'new_activity',
+              title:             'New activity nearby',
+              message:           `${host?.name || 'Someone'} created "${title}" near you`,
+              relatedUserId:     req.userId,
+              relatedActivityId: activity.id,
+            });
+          })
+      );
+    }
+
     res.status(201).json({ message: 'Activity created successfully', activity });
   } catch (error) { next(error); }
 };
