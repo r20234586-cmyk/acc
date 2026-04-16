@@ -66,7 +66,13 @@ const createActivity = async (req, res, next) => {
 /* GET /api/activities — list all (public) */
 const getAllActivities = async (req, res, next) => {
   try {
+    const now = new Date();
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000); // 3 hours ago
+
     const activities = await Activity.findAll({
+      where: {
+        time: { [Op.gt]: threeHoursAgo }, // Only show activities scheduled within the last 3 hours
+      },
       include: [{ model: User, as: 'host', attributes: ['id', 'name', 'profilePicture'] }],
       order: [['createdAt', 'DESC']],
     });
@@ -77,10 +83,17 @@ const getAllActivities = async (req, res, next) => {
 /* GET /api/activities/:id — single activity detail */
 const getActivityById = async (req, res, next) => {
   try {
-    const activity = await Activity.findByPk(req.params.id, {
+    const now = new Date();
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+
+    const activity = await Activity.findOne({
+      where: {
+        id: req.params.id,
+        time: { [Op.gt]: threeHoursAgo }, // Only allow access if not expired
+      },
       include: [{ model: User, as: 'host', attributes: ['id', 'name', 'profilePicture'] }],
     });
-    if (!activity) return res.status(404).json({ message: 'Activity not found' });
+    if (!activity) return res.status(404).json({ message: 'Activity not found or expired' });
     res.status(200).json(activity);
   } catch (error) { next(error); }
 };
@@ -88,8 +101,16 @@ const getActivityById = async (req, res, next) => {
 /* POST /api/activities/:id/join — add user to joined[] */
 const joinActivity = async (req, res, next) => {
   try {
-    const activity = await Activity.findByPk(req.params.id);
-    if (!activity) return res.status(404).json({ message: 'Activity not found' });
+    const now = new Date();
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+
+    const activity = await Activity.findOne({
+      where: {
+        id: req.params.id,
+        time: { [Op.gt]: threeHoursAgo }, // Only allow joining if not expired
+      },
+    });
+    if (!activity) return res.status(404).json({ message: 'Activity not found or expired' });
     if (activity.joined.includes(req.userId)) return res.status(400).json({ message: 'Already joined this activity' });
     if (activity.joined.length >= activity.max) return res.status(400).json({ message: 'Activity is full' });
 
@@ -122,8 +143,16 @@ const joinActivity = async (req, res, next) => {
 /* DELETE /api/activities/:id/leave — remove user from joined[] */
 const leaveActivity = async (req, res, next) => {
   try {
-    const activity = await Activity.findByPk(req.params.id);
-    if (!activity) return res.status(404).json({ message: 'Activity not found' });
+    const now = new Date();
+    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+
+    const activity = await Activity.findOne({
+      where: {
+        id: req.params.id,
+        time: { [Op.gt]: threeHoursAgo }, // Only allow leaving if not expired
+      },
+    });
+    if (!activity) return res.status(404).json({ message: 'Activity not found or expired' });
     if (activity.hostId === req.userId) return res.status(400).json({ message: 'You are the host. Delete the activity instead of leaving.' });
     if (!activity.joined.includes(req.userId)) return res.status(400).json({ message: 'You have not joined this activity' });
 
