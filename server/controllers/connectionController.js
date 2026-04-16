@@ -76,10 +76,10 @@ const getConnections = async (req, res, next) => {
   }
 };
 
-/* ── POST /api/connections/request/:userId — send connection request  */
+/* ── POST /api/connect — send connection request  */
 const sendRequest = async (req, res, next) => {
   try {
-    const { userId: recipientId } = req.params;
+    const { userId: recipientId } = req.body;
     const requesterId = req.userId;
 
     if (requesterId === recipientId) {
@@ -118,11 +118,12 @@ const sendRequest = async (req, res, next) => {
   }
 };
 
-/* ── PUT /api/connections/:id/accept — accept a request ─────────── */
+/* ── POST /api/connect/accept — accept a request ─────────── */
 const acceptRequest = async (req, res, next) => {
   try {
+    const { requestId } = req.body;
     const conn = await Connection.findOne({
-      where: { id: req.params.id, recipientId: req.userId, status: 'pending' },
+      where: { id: requestId, recipientId: req.userId, status: 'pending' },
     });
     if (!conn) return res.status(404).json({ message: 'Request not found' });
 
@@ -154,15 +155,27 @@ const acceptRequest = async (req, res, next) => {
   }
 };
 
-/* ── PUT /api/connections/:id/decline — decline a request ──────── */
+/* ── POST /api/connect/reject — decline a request ──────── */
 const declineRequest = async (req, res, next) => {
   try {
+    const { requestId } = req.body;
     const conn = await Connection.findOne({
-      where: { id: req.params.id, recipientId: req.userId, status: 'pending' },
+      where: { id: requestId, recipientId: req.userId, status: 'pending' },
     });
     if (!conn) return res.status(404).json({ message: 'Request not found' });
 
     await conn.update({ status: 'declined' });
+
+    // Optionally notify the sender
+    const rejector = await User.findByPk(req.userId, { attributes: ['name'] });
+    await createNotification({
+      userId:        conn.requesterId,
+      type:          'connection_request',
+      title:         'Connection request declined',
+      message:       `${rejector?.name || 'Someone'} declined your connection request`,
+      relatedUserId: req.userId,
+    });
+
     res.status(200).json({ message: 'Connection declined' });
   } catch (error) {
     next(error);

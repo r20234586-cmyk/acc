@@ -5,6 +5,7 @@ const { Op }   = require('sequelize');
 const Activity = require('../models/Activity');
 const User     = require('../models/User');
 const Notification = require('../models/Notification');
+const ActivityNotificationLog = require('../models/ActivityNotificationLog');
 const { createNotification } = require('./notificationController');
 const { haversineDistance } = require('../utils/location/haversine');
 
@@ -42,11 +43,12 @@ const createActivity = async (req, res, next) => {
         candidates
           .filter(u => haversineDistance(latitude, longitude, u.latitude, u.longitude) <= PROXIMITY_RADIUS_KM)
           .map(async (u) => {
-            // Dedup: skip if user already has a new_activity notif for this activity
-            const existing = await Notification.findOne({
-              where: { userId: u.id, type: 'new_activity', relatedActivityId: activity.id },
+            // Dedup: check if already logged for this activity and user
+            const existing = await ActivityNotificationLog.findOne({
+              where: { activityId: activity.id, userId: u.id },
             });
             if (existing) return;
+            await ActivityNotificationLog.create({ activityId: activity.id, userId: u.id });
             await createNotification({
               userId:            u.id,
               type:              'new_activity',

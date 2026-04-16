@@ -10,19 +10,19 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-/* GET /api/connections              — accepted connections list */
+/* POST /api/connect — send connection request */
+router.post('/', auth, sendRequest);
+
+/* POST /api/connect/accept — accept request */
+router.post('/accept', auth, acceptRequest);
+
+/* POST /api/connect/reject — reject request */
+router.post('/reject', auth, declineRequest);
+
+/* GET /api/connections — accepted connections list */
 router.get('/', auth, getConnections);
 
-/* GET /api/connections/requests     — incoming pending requests */
+/* GET /api/connections/requests — incoming pending requests */
 router.get('/requests', auth, getRequests);
-
-/* POST /api/connections/request/:userId — send a request */
-router.post('/request/:userId', auth, sendRequest);
-
-/* PUT /api/connections/:id/accept   — accept a request */
-router.put('/:id/accept', auth, acceptRequest);
-
-/* PUT /api/connections/:id/decline  — decline a request */
-router.put('/:id/decline', auth, declineRequest);
 
 module.exports = router;
