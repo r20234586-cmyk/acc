@@ -27,6 +27,7 @@ import DashboardView     from "./components/dashboard/DashboardView";
 import NotificationsView from "./components/notifications/NotificationsView";
 import PeopleNearbyView  from "./components/people/PeopleNearbyView";
 import CalendarView      from "./components/calendar/CalendarView";
+import MyActivitiesView  from "./components/myactivities/MyActivitiesView";
 
 // UI
 import Toast from "./components/ui/Toast";
@@ -34,6 +35,7 @@ import Toast from "./components/ui/Toast";
 // Hooks
 import { useToast }         from "./hooks/useToast";
 import { useActivities }    from "./hooks/useActivities";
+import { useLocation }      from "./hooks/useLocation";
 import { useNotifications } from "./hooks/useNotifications";
 import { useConnections }   from "./hooks/useConnections";
 
@@ -95,10 +97,12 @@ function AppShell({ onSignOut, user }) {
   const [showProfile, setShowProfile]             = useState(false);
   const [showPeople, setShowPeople]               = useState(false);
   const [showCalendar, setShowCalendar]           = useState(false);
+  const [showMyActivities, setShowMyActivities]   = useState(false);
   const [selectedUser, setSelectedUser]           = useState(null);
   const [isDesktop, setIsDesktop]                 = useState(window.innerWidth >= 768);
 
   const { activities, addActivity, joinActivity, joinedIds, hostedActivities, joinedActivities } = useActivities();
+  const { coords, status: locStatus } = useLocation();  // Get current user coordinates
   const { message: toast, showToast }       = useToast();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
   const { requests, accept, decline, requestCount }           = useConnections();
@@ -116,6 +120,7 @@ function AppShell({ onSignOut, user }) {
     setShowProfile(false);
     setShowPeople(false);
     setShowCalendar(false);
+    setShowMyActivities(false);
     setSelectedActivity(null);
     setChatActivity(null);
     setCreating(false);
@@ -124,7 +129,45 @@ function AppShell({ onSignOut, user }) {
 
   // ── Handlers ─────────────────────────────────────────────────────
   const handleJoin    = (a) => { joinActivity(a.id); showToast(`✓ Joined ${a.title}`); };
-  const handleCreate  = async (a) => { try { await addActivity(a); showToast("🎉 Activity created!"); setCreating(false); } catch { showToast("Failed to create activity"); } };
+  const handleCreate  = async (a) => { 
+    try { 
+      // Wait for location to be ready, or use fallback coordinates
+      let activityCoords = { latitude: null, longitude: null };
+      
+      if (coords) {
+        // Location already available
+        activityCoords = { latitude: coords.latitude, longitude: coords.longitude };
+      } else if (locStatus === 'requesting') {
+        // Wait up to 5 seconds for location to be ready
+        let attempts = 0;
+        while (!coords && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        if (coords) {
+          activityCoords = { latitude: coords.latitude, longitude: coords.longitude };
+        } else {
+          // Use fallback coordinates if location still not available
+          activityCoords = { latitude: 17.3850, longitude: 78.4867 }; // Hyderabad fallback
+        }
+      } else if (locStatus === 'denied' || locStatus === 'error') {
+        // Use fallback coordinates
+        activityCoords = { latitude: 17.3850, longitude: 78.4867 }; // Hyderabad fallback
+      }
+      
+      const activityWithLocation = {
+        ...a,
+        ...activityCoords,
+      };
+      
+      await addActivity(activityWithLocation); 
+      showToast("🎉 Activity created!"); 
+      setCreating(false); 
+    } catch (err) { 
+      console.error('Failed to create activity:', err);
+      showToast("Failed to create activity"); 
+    } 
+  };
   const handleOpenActivity = (a) => { closeAll(); setSelectedActivity(a); };
   const handleOpenChat = () => { setChatActivity(selectedActivity); setSelectedActivity(null); };
   const handleSelectUser = (person) => { closeAll(); setSelectedUser(person); };
@@ -133,6 +176,7 @@ function AppShell({ onSignOut, user }) {
   const handleNotifications = () => { closeAll(); setShowNotifications(true); };
   const handleRequests      = () => { closeAll(); setShowRequests(true); };
   const handleProfile       = () => { closeAll(); setShowProfile(true); };
+  const handleMyActivities   = () => { closeAll(); setShowMyActivities(true); };
   const handlePeople        = () => { closeAll(); setShowPeople(true); };
   const handleCalendar      = () => { closeAll(); setShowCalendar(true); };
   const handleCreate_btn    = () => { closeAll(); setCreating(true); };
@@ -147,10 +191,11 @@ function AppShell({ onSignOut, user }) {
     if (showProfile)        { setShowProfile(false);       return; }
     if (showPeople)         { setShowPeople(false);         return; }
     if (showCalendar)       { setShowCalendar(false);       return; }
+    if (showMyActivities)   { setShowMyActivities(false);   return; }
   };
 
   // ── What's in the slide-over panel ────────────────────────────────
-  const overlay = selectedActivity || chatActivity || showNotifications || showRequests || showProfile || showPeople || showCalendar || creating || selectedUser;
+  const overlay = selectedActivity || chatActivity || showNotifications || showRequests || showProfile || showPeople || showCalendar || showMyActivities || creating || selectedUser;
 
   // ── Main page content ─────────────────────────────────────────────
   const renderPage = () => {
@@ -228,6 +273,13 @@ function AppShell({ onSignOut, user }) {
     if (showCalendar) return (
       <CalendarView onBack={() => setShowCalendar(false)} />
     );
+    if (showMyActivities) return (
+      <MyActivitiesView
+        activities={[...hostedActivities, ...joinedActivities]}
+        onBack={() => setShowMyActivities(false)}
+        onOpen={handleOpenActivity}
+      />
+    );
     if (showProfile) return (
       <ProfileView
         onLogout={() => { closeAll(); onSignOut(); }}
@@ -248,6 +300,7 @@ function AppShell({ onSignOut, user }) {
     onNotificationsClick: handleNotifications,
     onRequestsClick: handleRequests,
     onProfileClick: handleProfile,
+    onMyActivitiesClick: handleMyActivities,
     onLogout: () => { closeAll(); onSignOut(); },
     onCreateClick: handleCreate_btn,
     user, // pass real user data for avatar/initials in nav

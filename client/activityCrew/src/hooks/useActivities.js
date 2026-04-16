@@ -62,14 +62,26 @@ export function useActivities() {
   /* ── Create a new activity ──────────────────────────────────────── */
   const addActivity = async (formData) => {
     try {
+      let timeISO;
+      if (formData.date && formData.time) {
+        // formData.time may be either "HH:MM" or "YYYY-MM-DD, HH:MM" (legacy UI path)
+        const normalized = formData.time.includes(',')
+          ? formData.time.split(',').map(t => t.trim())
+          : [formData.date, formData.time];
+        const [datePart, timePart] = normalized;
+        const maybeDate = new Date(`${datePart}T${timePart}`);
+        timeISO = Number.isNaN(maybeDate.getTime()) ? null : maybeDate.toISOString();
+      }
+      if (!timeISO) {
+        timeISO = new Date().toISOString();
+      }
+
       const payload = {
         title:       formData.title,
         description: formData.description || '',
         category:    formData.category,
         location:    formData.location,
-        time:        formData.date && formData.time
-          ? new Date(`${formData.date}T${formData.time}`).toISOString()
-          : new Date().toISOString(),
+        time:        timeISO,
         max:         parseInt(formData.max) || 8,
         tags:        formData.tags || [formData.category, formData.activityType].filter(Boolean),
         color:       formData.color || '#FF6B35',

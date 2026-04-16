@@ -72,7 +72,7 @@ export default function CreateActivity({ onBack, onCreate }) {
   };
 
   const handleCreate = () => {
-    if (!form.title || !form.location) return;
+    if (!form.title || !form.location || !hasValidDateTime) return;
     const selectedCategory = CATEGORIES.find((c) => c.id === form.category);
     onCreate({
       ...form,
@@ -85,7 +85,8 @@ export default function CreateActivity({ onBack, onCreate }) {
       color: selectedCategory?.color || "#FF6B35",
       attendees: ["ME"],
       tags: [form.category, form.activityType],
-      time: form.date && form.time ? `${form.date}, ${form.time}` : "TBD",
+      // keep date and time separately for addActivity to create a valid ISO timestamp
+      time: form.time || "",
       media: mediaFiles.map(m => ({ type: m.type, url: m.url, name: m.name })),
       coverImage: mediaFiles.find(m => m.type === "image")?.url || null,
       coverVideo: mediaFiles.find(m => m.type === "video")?.url || null,
@@ -94,7 +95,8 @@ export default function CreateActivity({ onBack, onCreate }) {
   };
 
   const accentColor = selectedCategory?.color || "#FF6B35";
-  const canProceed = form.title && form.location;
+  const hasValidDateTime = !!(form.date && form.time && !Number.isNaN(new Date(`${form.date}T${form.time}`).getTime()));
+  const canProceed = form.title && form.location && hasValidDateTime;
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#0d0d12" }}>
@@ -191,6 +193,12 @@ export default function CreateActivity({ onBack, onCreate }) {
                 <input type="time" value={form.time} onChange={e => set("time", e.target.value)} style={INPUT_STYLE} />
               </div>
             </div>
+
+            {(!form.date || !form.time || !hasValidDateTime) && (
+              <p style={{ color: "#FF7676", fontSize: 12, marginTop: -8, marginBottom: 12 }}>
+                Enter a valid date and time before continuing.
+              </p>
+            )}
 
             {/* Max Participants */}
             <label style={LABEL_STYLE}>Max Participants</label>

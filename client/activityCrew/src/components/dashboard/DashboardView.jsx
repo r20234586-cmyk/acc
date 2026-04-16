@@ -59,13 +59,26 @@ function StatCard({ stat }) {
 }
 
 // ── Upcoming Activity Item (location-aware) ────────────────────────────
-function UpcomingItem({ activity }) {
+function UpcomingItem({ activity, onClick }) {
   const dt = formatDateTime(activity.time);
   const category = CATEGORIES.find(c => c.id === activity.category);
   const color = activity.color || '#FF6B35';
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <div 
+      onClick={() => onClick && onClick(activity)}
+      style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 14, 
+        padding: '12px 0', 
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        cursor: 'pointer',
+        transition: 'opacity 0.2s'
+      }}
+      onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+    >
       {/* Date badge */}
       <div style={{ width: 46, height: 46, borderRadius: 12, flexShrink: 0, background: `${color}14`, border: `1px solid ${color}30`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ fontSize: 9, fontWeight: 700, color, fontFamily: "'DM Sans', sans-serif", letterSpacing: 0.5 }}>{dt.dayShort}</div>
@@ -150,9 +163,9 @@ export default function DashboardView({ user, onCreateClick, activities, onOpen,
   const [statsLoading, setStatsLoading] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
-  // Location + nearby data
+  // Location + nearby data (real data within 10 km radius)
   const { coords, status: locStatus } = useLocation();
-  const { nearbyUsers, nearbyActivities, loading: nearbyLoading, usingDummy } = useNearby(coords);
+  const { nearbyUsers, nearbyActivities, loading: nearbyLoading, error: nearbyError } = useNearby(coords);
 
   useEffect(() => {
     (async () => {
@@ -174,8 +187,15 @@ export default function DashboardView({ user, onCreateClick, activities, onOpen,
     { label: 'Rating',     value: Number(stats.rating || 0).toFixed(1), unit: 'avg', icon: '★', color: '#A78BFA' },
   ] : [];
 
-  // Show 4 nearest upcoming activities
-  const upcomingActivities = nearbyActivities.slice(0, 4);
+  // Show 4 nearest upcoming activities (nearby), OR fallback to all activities if location denied
+  const upcomingActivities = locStatus === 'granted' && nearbyActivities.length > 0 
+    ? nearbyActivities.slice(0, 4)
+    : activities.filter(a => {
+        // Show upcoming activities (future dates) if location not available
+        const actTime = new Date(a.time);
+        return actTime > new Date();
+      }).slice(0, 4);
+  
   // Show 4 nearest people
   const peopleSample = nearbyUsers.slice(0, 4);
 
@@ -194,7 +214,7 @@ export default function DashboardView({ user, onCreateClick, activities, onOpen,
             {user?.email && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Sans', sans-serif", marginTop: 6 }}>📧 {user.email}</div>}
             {/* Show real-time location status */}
             <div style={{ fontSize: 12, fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
-              {locStatus === 'granted'    && <span style={{ color: '#34D399' }}>📍 Location on · showing real nearby data</span>}
+              {locStatus === 'granted'    && <span style={{ color: '#34D399' }}>📍 Showing activities within 10 km</span>}
               {locStatus === 'requesting' && <span style={{ color: '#FBBF24' }}>🧭 Getting your location…</span>}
               {locStatus === 'denied'     && <span style={{ color: 'rgba(255,255,255,0.35)' }}>📍 {user?.location || 'Location off'}</span>}
             </div>
@@ -243,13 +263,15 @@ export default function DashboardView({ user, onCreateClick, activities, onOpen,
           <section>
             <SectionTitle action="View all →" onAction={() => onNavigate && onNavigate('calendar')}>
               Upcoming Near You
-              {usingDummy && <span style={{ color: '#FBBF24', fontSize: 10, marginLeft: 6, fontWeight: 400 }}>demo</span>}
             </SectionTitle>
             {nearbyLoading ? (
               <div>{[1,2,3,4].map(i => <div key={i} style={{ padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}><SkeletonRow /><SkeletonRow width="60%" /></div>)}</div>
             ) : upcomingActivities.length > 0 ? (
-              upcomingActivities.map(a => <UpcomingItem key={a.id} activity={a} />)
-            ) : (
+              upcomingActivities.map(a => <UpcomingItem key={a.id} activity={a} onClick={onOpen} />)            ) : locStatus === 'denied' ? (
+              <div style={{ padding: '24px 0', textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
+                <div>📍 Enable location to see nearby activities</div>
+                <div style={{ fontSize: 11, marginTop: 8, color: 'rgba(255,255,255,0.2)' }}>Or browse all activities in the Feed</div>
+              </div>            ) : (
               <div style={{ padding: '24px 0', textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>No upcoming activities nearby</div>
             )}
           </section>
@@ -258,7 +280,6 @@ export default function DashboardView({ user, onCreateClick, activities, onOpen,
           <section>
             <SectionTitle action="Browse all →" onAction={() => onNavigate && onNavigate('people')}>
               People Near You
-              {usingDummy && <span style={{ color: '#FBBF24', fontSize: 10, marginLeft: 6, fontWeight: 400 }}>demo</span>}
             </SectionTitle>
             {nearbyLoading ? (
               <div>{[1,2,3,4].map(i => <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', gap: 12, alignItems: 'center' }}><div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} /><div style={{ flex: 1 }}><SkeletonRow /><SkeletonRow width="50%" /></div></div>)}</div>

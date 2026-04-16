@@ -24,8 +24,16 @@ connectDB();
 
 // Middleware Stack (Order matters!)
 // 1. CORS with credentials
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174').split(',');
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (incomingOrigin, callback) => {
+    if (!incomingOrigin || allowedOrigins.includes(incomingOrigin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS policy violation: origin ${incomingOrigin} not allowed`));
+    }
+  },
   credentials: true, // Allow cookies
 }));
 

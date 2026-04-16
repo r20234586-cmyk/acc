@@ -126,7 +126,7 @@ function SkeletonCard() {
 
 export default function PeopleNearbyView({ onBack, onSelectPerson }) {
   const { coords, status: locStatus } = useLocation();
-  const { nearbyUsers, loading, usingDummy } = useNearby(coords);
+  const { nearbyUsers, loading, error } = useNearby(coords);
 
   const [filter, setFilter]   = useState('All');
   const [sortBy, setSortBy]   = useState('distance');
@@ -148,7 +148,6 @@ export default function PeopleNearbyView({ onBack, onSelectPerson }) {
             <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', fontFamily: "'Syne', sans-serif", margin: 0 }}>People Nearby</h2>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', fontFamily: "'DM Sans', sans-serif", margin: '2px 0 0' }}>
               {loading ? 'Finding people near you…' : `${filtered.length} people within 10 km`}
-              {usingDummy && !loading && <span style={{ color: '#FBBF24', marginLeft: 6 }}>· demo data</span>}
             </p>
           </div>
         </div>

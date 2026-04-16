@@ -84,15 +84,45 @@ const getNearbyActivities = async (req, res, next) => {
     const lat = parseFloat(req.query.lat);
     const lon = parseFloat(req.query.lon);
 
+    // If coordinates invalid, fallback to all future activities (no distance filtering)
     if (isNaN(lat) || isNaN(lon)) {
-      return res.status(400).json({ message: 'lat and lon query params required' });
+      const activities = await Activity.findAll({
+        where: {
+          time: { [Op.gte]: new Date() }, // only future activities
+        },
+        include: [
+          {
+            model: User,
+            as: 'host',
+            attributes: ['id', 'name', 'profilePicture'],
+          },
+        ],
+        order: [['time', 'ASC']],
+      });
+      return res.status(200).json({ activities: activities.map(a => a.toJSON()), count: activities.length });
     }
 
     const delta = RADIUS_KM / 111;
     const activities = await Activity.findAll({
       where: {
-        latitude:  { [Op.between]: [lat - delta, lat + delta] },
-        longitude: { [Op.between]: [lon - delta, lon + delta] },
+        [Op.or]: [
+          // Activities with coordinates within range
+          {
+            [Op.and]: [
+              { latitude: { [Op.ne]: null } },
+              { longitude: { [Op.ne]: null } },
+              { latitude: { [Op.between]: [lat - delta, lat + delta] } },
+              { longitude: { [Op.between]: [lon - delta, lon + delta] } },
+            ]
+          },
+          // Activities without coordinates (show them too, but without distance)
+          {
+            [Op.and]: [
+              { latitude: null },
+              { longitude: null },
+            ]
+          }
+        ],
         time: { [Op.gte]: new Date() }, // only future activities
       },
       include: [
@@ -107,10 +137,16 @@ const getNearbyActivities = async (req, res, next) => {
 
     const nearby = activities
       .map((a) => {
-        const km = haversineDistance(lat, lon, a.latitude, a.longitude);
-        return { ...a.toJSON(), distanceKm: km, distance: formatDistance(km) };
+        // Calculate distance only for activities with coordinates
+        if (a.latitude !== null && a.longitude !== null) {
+          const km = haversineDistance(lat, lon, a.latitude, a.longitude);
+          return { ...a.toJSON(), distanceKm: km, distance: formatDistance(km) };
+        } else {
+          // Activities without coordinates get a high distance so they appear last
+          return { ...a.toJSON(), distanceKm: 999, distance: 'Anywhere' };
+        }
       })
-      .filter((a) => a.distanceKm <= RADIUS_KM)
+      .filter((a) => a.distanceKm <= RADIUS_KM || a.distanceKm === 999) // Include activities without coordinates
       .sort((a, b) => a.distanceKm - b.distanceKm);
 
     res.status(200).json({ activities: nearby, count: nearby.length });

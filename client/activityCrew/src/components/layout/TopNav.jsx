@@ -25,7 +25,7 @@ const NAV_TABS = [
 
 export default function TopNav({
   activeTab, onTabChange, unreadCount = 0, requestCount = 0,
-  onNotificationsClick, onRequestsClick, onProfileClick, onLogout, onCreateClick, user,
+  onNotificationsClick, onRequestsClick, onProfileClick, onMyActivitiesClick, onLogout, onCreateClick, user,
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -110,6 +110,13 @@ export default function TopNav({
               {/* Backdrop to close menu */}
               <div onClick={() => setShowProfileMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 250 }} />
               <div className={styles.profileMenu}>
+                <button
+                  className={styles.menuItem}
+                  onClick={() => { onMyActivitiesClick(); setShowProfileMenu(false); }}
+                  style={{ color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                >
+                  <UserIcon /> My Activities
+                </button>
                 <button
                   className={styles.menuItem}
                   onClick={() => { onProfileClick(); setShowProfileMenu(false); }}
