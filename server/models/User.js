@@ -30,6 +30,10 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  email_verification_token: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   password_reset_token: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -57,7 +61,6 @@ const User = sequelize.define('User', {
   google_id: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,
   },
   bio: {
     type: DataTypes.TEXT,

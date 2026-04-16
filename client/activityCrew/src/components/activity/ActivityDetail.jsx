@@ -16,7 +16,7 @@ const ChatIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 const HeartIcon  = ({ filled }) => <svg width="15" height="15" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
 const CheckIcon  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>;
 
-export default function ActivityDetail({ activity, onBack, onChat, onJoin, isJoined = false }) {
+export default function ActivityDetail({ activity, onBack, onChat, onJoin, onDelete, isJoined = false, userId }) {
   const [likes, setLikes] = useState({});
   const category = CATEGORIES.find((c) => c.id === activity.category);
 
@@ -168,6 +168,11 @@ export default function ActivityDetail({ activity, onBack, onChat, onJoin, isJoi
           <button onClick={onChat} className={styles.chatBtn} title="Open group chat">
             <ChatIcon />
           </button>
+          {userId === activity.hostId && (
+            <button onClick={() => onDelete && onDelete(activity.id)} className={styles.deleteBtn} title="Delete activity">
+              🗑️
+            </button>
+          )}
         </div>
       </div>
     </div>

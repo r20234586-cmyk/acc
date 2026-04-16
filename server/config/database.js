@@ -22,6 +22,8 @@ const connectDB = async () => {
     const Activity = require('../models/Activity');
     const Notification = require('../models/Notification');
     const RefreshToken = require('../models/RefreshToken');
+    const Connection = require('../models/Connection');
+    const ActivityNotificationLog = require('../models/ActivityNotificationLog');
 
     // User-Activity associations
     User.hasMany(Activity, { foreignKey: 'hostId', as: 'hostedActivities' });
@@ -39,6 +41,18 @@ const connectDB = async () => {
     User.hasMany(RefreshToken, { foreignKey: 'user_id', as: 'refreshTokens' });
     RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 
+    // Connection associations
+    User.hasMany(Connection, { foreignKey: 'requesterId', as: 'sentConnections' });
+    User.hasMany(Connection, { foreignKey: 'recipientId', as: 'receivedConnections' });
+    Connection.belongsTo(User, { foreignKey: 'requesterId', as: 'requester' });
+    Connection.belongsTo(User, { foreignKey: 'recipientId', as: 'recipient' });
+
+    // ActivityNotificationLog associations
+    Activity.hasMany(ActivityNotificationLog, { foreignKey: 'activityId' });
+    User.hasMany(ActivityNotificationLog, { foreignKey: 'userId' });
+    ActivityNotificationLog.belongsTo(Activity, { foreignKey: 'activityId' });
+    ActivityNotificationLog.belongsTo(User, { foreignKey: 'userId' });
+
     /* ── Chat message associations ──────────────────────────────────
        ChatMessage belongs to Activity (the group chat room)
        ChatMessage belongs to User (the sender)
@@ -48,15 +62,6 @@ const connectDB = async () => {
     ChatMessage.belongsTo(Activity, { foreignKey: 'activityId' });
     User.hasMany(ChatMessage, { foreignKey: 'senderId', as: 'sentMessages' });
     ChatMessage.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
-
-    /* ── Connection associations ─────────────────────────────────────
-       User sends/receives connection requests
-    ────────────────────────────────────────────────────────────── */
-    const Connection = require('../models/Connection');
-    User.hasMany(Connection, { foreignKey: 'requesterId', as: 'sentConnections' });
-    User.hasMany(Connection, { foreignKey: 'recipientId', as: 'receivedConnections' });
-    Connection.belongsTo(User, { foreignKey: 'requesterId', as: 'requester' });
-    Connection.belongsTo(User, { foreignKey: 'recipientId', as: 'recipient' });
     
     return sequelize;
   } catch (error) {

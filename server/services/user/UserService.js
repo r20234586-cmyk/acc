@@ -212,7 +212,9 @@ class UserService {
     }
 
     // Return full user data (minus sensitive fields like password)
-    return user.toJSON();
+    const userData = user.toJSON();
+    delete userData.password; // Remove password hash
+    return userData;
   }
 }
 

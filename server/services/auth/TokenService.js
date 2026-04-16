@@ -29,25 +29,11 @@ class TokenService {
   }
 
   /**
-   * Generate refresh token (long-lived)
-   * Stores token in database with metadata
-   * @param {string} userId - User ID
-   * @param {object} metadata - IP address, user agent for security
-   * @returns {Promise<string>} Refresh token
+   * Generate verification token
+   * @returns {string} Random token
    */
-  static async generateRefreshToken(userId, metadata = {}) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    await RefreshToken.create({
-      user_id: userId,
-      token,
-      expires_at: expiresAt,
-      ip_address: metadata.ip || null,
-      user_agent: metadata.userAgent || null,
-    });
-
-    return token;
+  static generateVerificationToken() {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   /**

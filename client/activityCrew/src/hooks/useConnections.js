@@ -38,7 +38,7 @@ export function useConnections() {
     setRequests(rs => rs.filter(r => r.id !== id));
     if (req) setConnected(c => [...c, req]);
     try {
-      await api.put(`/api/connections/${id}/accept`);
+      await api.post('/api/connections/accept', { requestId: id });
     } catch (err) {
       console.warn('[useConnections] accept failed:', err.message);
       fetchRequests(); // restore
@@ -49,7 +49,7 @@ export function useConnections() {
   const decline = async (id) => {
     setRequests(rs => rs.filter(r => r.id !== id));
     try {
-      await api.put(`/api/connections/${id}/decline`);
+      await api.post('/api/connections/decline', { requestId: id });
     } catch (err) {
       console.warn('[useConnections] decline failed:', err.message);
       fetchRequests();

@@ -19,6 +19,9 @@ class AuthService {
    * @throws {ValidationError} If validation fails
    */
   static async register(userData) {
+    // Generate verification token
+    const verificationToken = TokenService.generateVerificationToken();
+
     // Create user (UserService validates email uniqueness)
     const user = await UserService.create({
       name: userData.name,
@@ -27,10 +30,11 @@ class AuthService {
       location: userData.location,
       interests: userData.interests,
       timePreferences: userData.timePreferences,
+      email_verification_token: verificationToken,
     });
 
     // TODO: Send verification email (EmailService)
-    // await EmailService.sendVerificationEmail(user);
+    // await EmailService.sendVerificationEmail(user, verificationToken);
 
     return {
       user: {
@@ -294,8 +298,19 @@ class AuthService {
    * @throws {AuthError} If token invalid
    */
   static async verifyEmail(verificationToken) {
-    // TODO: Find user by verification token and verify
-    // For now, return success
+    const user = await User.findOne({
+      where: { email_verification_token: verificationToken },
+    });
+    if (!user) {
+      throw new AuthError('Invalid verification token');
+    }
+
+    await user.update({
+      email_verified: true,
+      email_verified_at: new Date(),
+      email_verification_token: null,
+    });
+
     return {
       message: 'Email verification successful. You can now log in.',
     };

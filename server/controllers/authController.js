@@ -163,7 +163,7 @@ const updateProfile = async (req, res, next) => {
  */
 const getUserById = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { id: userId } = req.params;
 
     const user = await UserService.getPublicProfile(userId);
 
